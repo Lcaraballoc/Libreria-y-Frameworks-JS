@@ -4,6 +4,7 @@ var puntaje;
 var idRealizarMovimientosInterval;
 var movimientos;
 
+
 //Funcion para que titulo cambie de color intermitentemente //
 function colorAmarillo(elemento){
   $(elemento).animate(
@@ -25,6 +26,26 @@ function colorBlanco(elemento){
 
     }
   )
+}
+
+ // Funciones para rellenar el tablero de piezas //
+
+function removerElementos() {
+    for (var col = 1; col <= 7; ++col) {
+        $('.col-' + col).empty();
+    }
+}
+
+function rellenarTablero() {
+    for (var col = 1; col <= 7; ++col) {
+        for (var fila = 1; fila <= 7; ++fila) {
+            var nuevaImagen = $('<img>',
+                {"src": "image/" + (1 + Math.floor(Math.random() * 4)) + ".png", "class": "elemento"}
+            );
+            $(nuevaImagen).draggable();
+            $('.col-' + col).append(nuevaImagen);
+        }
+    }
 }
 
 //Funcion para Iniciar Juego//
@@ -101,6 +122,26 @@ function droppableDraggable() {
         }
     });
 }
+
+function actualiarNumeroMovimientos() {
+    movimientos += 1;
+
+    $('#movimientos-text').text(movimientos);
+}
+
+function intercambiarElementos(elm1, elm2) {
+    var parent1, next1,
+        parent2, next2;
+
+    parent1 = elm1.parentNode;
+    next1 = elm1.nextSibling;
+    parent2 = elm2.parentNode;
+    next2 = elm2.nextSibling;
+
+    parent1.insertBefore(elm2, next1);
+    parent2.insertBefore(elm1, next2);
+}
+
 
 //Funciones para realizar movimientos en el juego//
 
@@ -207,6 +248,28 @@ function actualizarTablero(figurasMarcadas) {
     }
 }
 
+function actualizarPuntaje(masPuntaje) {
+    puntaje += masPuntaje;
+
+    $('#score-text').text(puntaje);
+}
+
+function crearDulces() {
+    for (var col = 0; col < 7; ++col) {
+        if ($('.col-' + (col + 1)).children().length < 7) {
+            var numeroDulces = 7 - $('.col-' + (col + 1)).children().length;
+
+            for (var i = 1; i <= numeroDulces; ++i) {
+                var nuevoDulce = $('<img>',
+                    {"src": "image/" + (1 + Math.floor(Math.random() * 4)) + ".png", "class": "elemento"});
+                $('.col-' + (col + 1)).prepend(nuevoDulce);
+            }
+        }
+    }
+
+    droppableDraggable();
+}
+
 // Inicializando aplicacion ----------//
   $(function(){
       colorAmarillo($(".main-titulo"));
@@ -234,7 +297,7 @@ function actualizarTablero(figurasMarcadas) {
                 $(".time").css('opacity', '1.0');
             }
 
-            $('.main-titulo-juego-terminado').css("display", "none");
+            $('.titulo_juego_terminado').css("display", "none");
 
             removerElementos();
             rellenarTablero();
