@@ -99,10 +99,14 @@ div[class^='col']{
 
 }
 
-.elemento{
-  height: 14.28%;
+.main-titulo-juego-terminado {
+    font-family: gameFont;
+    font-size: 3em;
+    color: #DCFF0E;
+    width: 100%;
 }
 
-img{
-  width: 85%;
+.elemento{
+  width: 99.4px;
+    height: 96px;
 }

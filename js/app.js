@@ -55,7 +55,7 @@ function iniciarJuego() {
 
   droppableDraggable();
 
-  $('#timer').countdowntimer({
+  $('#countdowntimer').countdowntimer({
       minutes: 2,
       seconds: 0,
       timeUp: function () {
@@ -275,13 +275,13 @@ function crearDulces() {
       colorAmarillo($(".main-titulo"));
 
       $(".col-1").droppable({accept: ".col-2"});
-      $(".col-2").droppable({accept: ".col-1, .col-3"});
-      $(".col-3").droppable({accept: ".col-2, .col-4"});
-      $(".col-4").droppable({accept: ".col-3, .col-5"});
-      $(".col-5").droppable({accept: ".col-4, .col-6"});
-      $(".col-6").droppable({accept: ".col-5, .col-7"});
-      $(".col-7").droppable({accept: ".col-6"});
-
+        $(".col-2").droppable({accept: ".col-1, .col-3"});
+        $(".col-3").droppable({accept: ".col-2, .col-4"});
+        $(".col-4").droppable({accept: ".col-3, .col-5"});
+        $(".col-5").droppable({accept: ".col-4, .col-6"});
+        $(".col-6").droppable({accept: ".col-5, .col-7"});
+        $(".col-7").droppable({accept: ".col-6"});
+        
       $('.btn-reinicio').click(function () {
         if ($('.btn-reinicio').text() === 'Iniciar') {
             if ($(".panel-tablero").css('display') === 'none') {
