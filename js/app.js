@@ -27,7 +27,82 @@ function colorBlanco(elemento){
   )
 }
 
-//Funcion para realizar movimientos en el juego//
+//Funcion para Iniciar Juego//
+
+function iniciarJuego() {
+  continuar = true;
+
+  droppableDraggable();
+
+  $('#timer').countdowntimer({
+      minutes: 2,
+      seconds: 0,
+      timeUp: function () {
+          continuar = false;
+          clearInterval(realizarMovimientos());
+
+          var anchoPanelTablero = $('.panel-tablero').css('width');
+
+          $(".panel-tablero").animate({
+              height: "0",
+              width: "0"
+          }, 4100, function () {
+              $(".panel-tablero").css('display', 'none');
+          });
+
+          $('.panel-score').animate({
+              width: anchoPanelTablero
+          }, 3000);
+
+          $('.time').animate({
+              opacity: 0.0
+          }, 2000);
+
+          $('.btn-reinicio').text('Iniciar');
+
+          $('.main-titulo-juego-terminado').css("display", "block")
+      }
+  });
+
+  idRealizarMovimientosInterval = setInterval(realizarMovimientos, 1500);
+}
+
+//Funcion para poder arrastrar y soltar piezas//
+
+function droppableDraggable() {
+    $(".elemento").draggable({
+        disabled: false,
+        cursor: "move",
+        containment: ".panel-tablero",
+        revert: true,
+        revertDuration: 500,
+        snap: ".elemento",
+        snapMode: "inner",
+        snapTolerance: 40,
+        stop: function (event, ui) {
+
+            actualiarNumeroMovimientos();
+        }
+    });
+    $(".elemento").droppable({
+        drop: function (event, ui) {
+            if (idRealizarMovimientosInterval !== 0) {
+                var dropped = ui.draggable;
+                var droppedOn = this;
+
+                var colDropped = Number($($(dropped).parent()).attr("class").substring(4, 5));
+                var colDroppedOn = Number($($(droppedOn).parent()).attr("class").substring(4, 5));
+
+                if ((Math.abs(colDropped - colDroppedOn) === 1) || colDroppedOn === colDropped) {
+                    intercambiarElementos(dropped[0], droppedOn);
+                    idRealizarMovimientosInterval = setInterval(realizarMovimientos, 1500);
+                }
+            }
+        }
+    });
+}
+
+//Funciones para realizar movimientos en el juego//
 
 function realizarMovimientos() {
 
@@ -98,6 +173,39 @@ function realizarMovimientos() {
     }
 }
 
+function inicializarFigurasMarcadas() {
+    var figurasMarcadas = [];
+
+    for (var row = 0; row < 7; ++row) {
+        figurasMarcadas[row] = new Array(7);
+        for (var col = 0; col < 7; ++col) {
+            figurasMarcadas[row][col] = false;
+        }
+    }
+
+    return figurasMarcadas;
+}
+
+function actualizarTablero(figurasMarcadas) {
+    var puntaje = 0;
+    for (var col = 0; col < 7; ++col) {
+        for (var fila = 0; fila < 7; ++fila) {
+            if (figurasMarcadas[fila][col]) {
+                $($('.col-' + (col + 1)).children()[fila]).addClass('remover');
+                puntaje += 10;
+            }
+        }
+    }
+
+    if ($('.remover').length > 0) {
+        $('.remover').fadeIn(400).fadeOut(400).fadeIn(400).fadeOut(300, function () {
+            $(this).remove();
+
+            actualizarPuntaje(puntaje);
+            crearDulces();
+        });
+    }
+}
 
 // Inicializando aplicacion ----------//
   $(function(){
@@ -111,43 +219,41 @@ function realizarMovimientos() {
       $(".col-6").droppable({accept: ".col-5, .col-7"});
       $(".col-7").droppable({accept: ".col-6"});
 
-
-      function iniciarJuego() {
-        continuar = true;
-
-        droppableDraggable();
-
-        $('#timer').countdowntimer({
-            minutes: 2,
-            seconds: 0,
-            timeUp: function () {
-                continuar = false;
-                clearInterval(realizarMovimientos());
-
-                var anchoPanelTablero = $('.panel-tablero').css('width');
-
-                $(".panel-tablero").animate({
-                    height: "0",
-                    width: "0"
-                }, 4100, function () {
-                    $(".panel-tablero").css('display', 'none');
-                });
-
-                $('.panel-score').animate({
-                    width: anchoPanelTablero
-                }, 3000);
-
-                $('.time').animate({
-                    opacity: 0.0
-                }, 2000);
-
-                $('.btn-reinicio').text('Iniciar');
-
-                $('.main-titulo-juego-terminado').css("display", "block")
+      $('.btn-reinicio').click(function () {
+        if ($('.btn-reinicio').text() === 'Iniciar') {
+            if ($(".panel-tablero").css('display') === 'none') {
+                $(".panel-tablero").css('display', 'flex');
+                $(".panel-tablero").css('width', '70%');
+                $(".panel-tablero").css('height', '700px');
+                $(".panel-score").css('display', 'flex');
+                $(".panel-score").css('width', '25%');
+                $(".panel-score").css('height', '700px');
+                $(".time").css('display', 'block');
+                $(".time").css('width', '100%');
+                $(".time").css('height', '23%');
+                $(".time").css('opacity', '1.0');
             }
-        });
 
-        idRealizarMovimientosInterval = setInterval(realizarMovimientos, 1500);
-      }
+            $('.main-titulo-juego-terminado').css("display", "none");
+
+            removerElementos();
+            rellenarTablero();
+            puntaje = 0;
+            movimientos = 0;
+            iniciarJuego();
+            $(this).text('Reiniciar');
+        }
+        else {
+            clearInterval(idRealizarMovimientosInterval);
+            $('#countdowntimer').countdowntimer({
+                minutes: 0,
+                seconds: 0
+            });
+            $(this).text('Iniciar');
+            $('#score-text').text('0');
+        }
+    });
+
+
 
 });
